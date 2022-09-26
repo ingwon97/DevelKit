@@ -158,53 +158,7 @@ public class ChatRedisCacheService {
 
         return ResponseDto.success(chatMessageDtoList);
     }
-    private void findOtherChatDataInMysql(List<ChatPagingResponseDto> chatMessageDtoList, Long workSpaceId, String cursor ){
 
-        String lastCursor;
-        // 데이터가 하나도 없을 경우 현재시간을 Cursor로 활용
-        if(chatMessageDtoList.size()==0 && cursor==null){
-            log.info("redis cache에 해당하는 데이터가 하나도 없습니다. DB 확인을 진행합니다.");
-            lastCursor = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS"));
-        }
-        //redis 적재된 마지막 데이터를 입력했을 경우.
-        else if(chatMessageDtoList.size()==0 && cursor!=null){
-            lastCursor=cursor;
-        }
-        // 데이터가 존재할 경우 CreatedAt을 Cursor로 사용
-        else lastCursor = chatMessageDtoList.get(chatMessageDtoList.size()-1).getCreatedAt();
-
-
-
-        int dtoListSize = chatMessageDtoList.size();
-        Slice<Chat> chatSlice =
-                chatRepository
-                        .findAllByCreatedAtBeforeAndWorkSpace_IdOrderByCreatedAtDesc(
-                                lastCursor,
-                                workSpaceId,
-                                PageRequest.of(0, 30)
-                        );
-
-        //redis에 적재하는 건 Thread 로 돌리는걸로 나중에 바꾸자.
-        for(Chat chat:chatSlice.getContent()){
-            cachingDBDataToRedis(chat);
-        }
-
-
-        //응답에 부족한 데이터 추가
-        //추가 데이터가 없을 때 return;
-        if(chatSlice.getContent().isEmpty())
-            return;
-
-        //추가 데이터가 존재하다면, responseDto에  데이터 추가.
-        for(int i = dtoListSize ; i <=10;i++){
-            try{
-                Chat chat = chatSlice.getContent().get( i - dtoListSize );
-                chatMessageDtoList.add(ChatPagingResponseDto.of(chat));
-            }catch (IndexOutOfBoundsException e){
-                return;
-            }
-        }
-    }
     public void cachingDBDataToRedis(Chat chat){
         ChatMessageSaveDto chatMessageSaveDto = ChatMessageSaveDto.of(chat);
         redisTemplate.opsForZSet().add(CHAT_SORTED_SET_ + chatMessageSaveDto.getRoomId(), chatMessageSaveDto, chatUtils.changeLocalDateTimeToDouble(chatMessageSaveDto.getCreatedAt()));
@@ -226,5 +180,55 @@ public class ChatRedisCacheService {
         roomRedisTemplate.opsForHash().put(USERNAME_NICKNAME,username,user.getNickname());
 
         return user.getNickname();
+    }
+
+    public void changeUserCachingNickname(String username,String changedNickname){
+        roomRedisTemplate.opsForHash().put(USERNAME_NICKNAME,username,changedNickname);
+    }
+
+    private void findOtherChatDataInMysql(List<ChatPagingResponseDto> chatMessageDtoList, Long workSpaceId, String cursor ){
+
+
+        String lastCursor;
+        // 데이터가 하나도 없을 경우 현재시간을 Cursor로 활용
+        if(chatMessageDtoList.size()==0 && cursor==null){
+            log.info("redis cache에 해당하는 데이터가 하나도 없습니다. DB 확인을 진행합니다.");
+            lastCursor = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS"));
+        }
+        //redis 적재된 마지막 데이터를 입력했을 경우.
+        else if(chatMessageDtoList.size()==0 && cursor!=null){
+            lastCursor=cursor;
+        }
+        // 데이터가 존재할 경우 CreatedAt을 Cursor로 사용
+        else lastCursor = chatMessageDtoList.get(chatMessageDtoList.size()-1).getCreatedAt();
+
+        int dtoListSize = chatMessageDtoList.size();
+        Slice<Chat> chatSlice =
+                chatRepository
+                        .findAllByCreatedAtBeforeAndWorkSpace_IdOrderByCreatedAtDesc(
+                                lastCursor,
+                                workSpaceId,
+                                PageRequest.of(0, 30)
+                        );
+
+        //redis에 적재하는 건 Thread 로 돌리는걸로 나중에 바꾸자.
+        for(Chat chat:chatSlice.getContent()){
+            cachingDBDataToRedis(chat);
+        }
+
+        //응답에 부족한 데이터 추가
+        //추가 데이터가 없을 때 return;
+        if(chatSlice.getContent().isEmpty())
+            return;
+
+        //추가 데이터가 존재하다면, responseDto에  데이터 추가.
+        for(int i = dtoListSize ; i <=10;i++){
+            try{
+                Chat chat = chatSlice.getContent().get( i - dtoListSize );
+                chatMessageDtoList.add(ChatPagingResponseDto.of(chat));
+            }catch (IndexOutOfBoundsException e){
+                return;
+            }
+        }
     }
 }

@@ -31,15 +31,22 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final WorkSpaceRepository workSpaceRepository;
 
+
     private final RedisPublisher redisPublisher;
 
     private final ChannelTopic channelTopic;
+
     //공지사항 생성
     @Transactional
     public ResponseEntity<ResponseDto<NoticeResponseDto>> createNotice(NoticeRequestDto noticeRequestDto,
                                           Long workSpaceId,
                                           UserDetailsImpl userDetails) {
         WorkSpace findWorkSpace = workSpaceRepository.findById(workSpaceId).orElse(null);
+        if (findWorkSpace == null) {
+            findWorkSpace = WorkSpace.builder()
+                    .id(workSpaceId)
+                    .build();
+        }
         Notice notice = Notice.builder()
                 .title(noticeRequestDto.getTitle())
                 .content(noticeRequestDto.getContent())
