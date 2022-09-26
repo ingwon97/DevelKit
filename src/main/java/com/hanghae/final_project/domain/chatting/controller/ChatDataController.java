@@ -2,7 +2,7 @@ package com.hanghae.final_project.domain.chatting.controller;
 
 import com.hanghae.final_project.domain.chatting.dto.request.ChatPagingDto;
 
-import com.hanghae.final_project.domain.chatting.dto.response.ResChatPagingDto;
+import com.hanghae.final_project.domain.chatting.dto.response.ChatPagingResponseDto;
 import com.hanghae.final_project.domain.chatting.service.ChatRedisCacheService;
 
 import com.hanghae.final_project.global.commonDto.ResponseDto;
@@ -29,9 +29,9 @@ public class ChatDataController {
 
     private final ChatRedisCacheService cacheService;
 
-    @ApiOperation(value = "채팅", notes = "수정해주세요")
+    @ApiOperation(value = "채팅", notes = "채팅 데이터 paging 통해 불러오기")
     @PostMapping("/api/chats/{workSpaceId}")
-    public ResponseDto<List<ResChatPagingDto>> getChatting(@PathVariable Long workSpaceId, @RequestBody(required = false) ChatPagingDto chatPagingDto){
+    public ResponseDto<List<ChatPagingResponseDto>> getChatting(@PathVariable Long workSpaceId, @RequestBody(required = false) ChatPagingDto chatPagingDto){
 
 
         //페이징을 하기위한 Cursor가 parameter로 들어오지 않을 때, 지금 시간을 기준으로 paging

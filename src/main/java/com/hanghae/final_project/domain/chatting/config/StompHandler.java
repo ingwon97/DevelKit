@@ -2,6 +2,7 @@ package com.hanghae.final_project.domain.chatting.config;
 
 
 import com.hanghae.final_project.domain.chatting.dto.request.ChatMessageSaveDto;
+import com.hanghae.final_project.domain.chatting.dto.request.MessageDto;
 import com.hanghae.final_project.domain.chatting.redis.RedisPublisher;
 import com.hanghae.final_project.domain.chatting.service.ChatRoomService;
 import com.hanghae.final_project.domain.chatting.utils.ChatUtils;
@@ -32,6 +33,9 @@ public class StompHandler implements ChannelInterceptor {
     public static final String SIMP_SESSION_ID = "simpSessionId";
     public static final String INVALID_ROOM_ID = "InvalidRoomId";
 
+    public static final String SUB_NOTICE = "notice";
+    public static final String SUB_CHAT = "chat";
+
     private final HeaderTokenExtractor headerTokenExtractor;
     private final ChatUtils chatUtils;
 
@@ -58,6 +62,7 @@ public class StompHandler implements ChannelInterceptor {
         }
         // 소켓 연결 후 ,SUBSCRIBE 등록
         else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
+
             log.info("SubScribe destination : " + message.getHeaders().get(SIMP_DESTINATION));
             log.info("SubScribe sessionId : " + message.getHeaders().get(SIMP_SESSION_ID));
 
@@ -73,24 +78,45 @@ public class StompHandler implements ChannelInterceptor {
                     (String) message.getHeaders().get(SIMP_SESSION_ID)
             ).orElse(null);
 
-            String roomId = chatUtils.getRoodIdFromDestination(destination);
+            // 채팅 구독 / 알림 구독 분기처리
 
-            //redis에  key(roomId) :  Value( sessionId , nickname ) 저장
-            chatRoomService.enterChatRoom(roomId, sessionId, username);
+            //알람일 경우
+            if (destination.contains(SUB_NOTICE)) {
+
+                //이 타이밍에 뭘 해야할까..?
+
+                log.info("알림 구독 하는 곳 ");
+
+            }
+
+            //채팅일 경우
+            if (destination.contains(SUB_CHAT)) {
+
+                String roomId = chatUtils.getRoodIdFromDestination(destination);
+
+                //redis에  key(roomId) :  Value( sessionId , nickname ) 저장
+                chatRoomService.enterChatRoom(roomId, sessionId, username);
 
 
-            //list 주기
-            redisPublisher.publish(topic,
-                    ChatMessageSaveDto.builder()
-                            .type(ChatMessageSaveDto.MessageType.ENTER)
-                            .roomId(roomId)
-                            .userList(chatRoomService.findUser(roomId, sessionId))
-                            .build()
-            );
+                ChatMessageSaveDto chatMessageSaveDto = ChatMessageSaveDto.builder()
+                        .type(ChatMessageSaveDto.MessageType.ENTER)
+                        .roomId(roomId)
+                        .userList(chatRoomService.findUser(roomId, sessionId))
+                        .build();
+                //list 주기
+                MessageDto<ChatMessageSaveDto> chatmessage= MessageDto.<ChatMessageSaveDto>builder()
+                        .type(MessageDto.MessageType.CHAT)
+                        .data(chatMessageSaveDto)
+                        .build();
 
-        }
+                redisPublisher.publishChatMessage(topic,
+                        chatmessage
+                );
 
-        else if(StompCommand.UNSUBSCRIBE==accessor.getCommand()){
+            }
+
+
+        } else if (StompCommand.UNSUBSCRIBE == accessor.getCommand()) {
             //진행해야할 것
             //reids SubScribe 해제
             log.info("UNSUBSCRIBE sessionId : " + message.getHeaders().get(SIMP_SESSION_ID));
@@ -102,37 +128,50 @@ public class StompHandler implements ChannelInterceptor {
 
             String roomId = chatRoomService.leaveChatRoom(sessionId);
 
-            log.info("Socket 연결 끊어진 RoomId : "+roomId);
+            log.info("Socket 연결 끊어진 RoomId : " + roomId);
 
+
+           ChatMessageSaveDto chatMessageSaveDto =  ChatMessageSaveDto.builder()
+                    .type(ChatMessageSaveDto.MessageType.QUIT)
+                    .roomId(roomId)
+                    .userList(chatRoomService.findUser(roomId, sessionId))
+                    .build();
             //list 주기
-            redisPublisher.publish(topic,
-                    ChatMessageSaveDto.builder()
-                            .type(ChatMessageSaveDto.MessageType.QUIT)
-                            .roomId(roomId)
-                            .userList(chatRoomService.findUser(roomId, sessionId))
-                            .build()
+
+            redisPublisher.publishChatMessage(topic,MessageDto.<ChatMessageSaveDto>builder()
+                    .data(chatMessageSaveDto)
+                    .type(MessageDto.MessageType.CHAT)
+                    .build()
             );
         }
         //소켓 연결 후 , 소켓 연결 해제 시
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             log.info("Disconnect sessionId : " + message.getHeaders().get(SIMP_SESSION_ID));
 
-            //Session_Id를 통해서
+            //Session_Id를 얻기
             String sessionId = Optional.ofNullable(
                     (String) message.getHeaders().get(SIMP_SESSION_ID)
             ).orElse(null);
 
             String roomId = chatRoomService.disconnectWebsocket(sessionId);
+            if (roomId == null) return message;
 
-            log.info("Socket 연결 끊어진 RoomId : "+roomId);
+            log.info("Socket 연결 끊어진 RoomId : " + roomId);
+
+
+            ChatMessageSaveDto chatMessageSaveDto=ChatMessageSaveDto.builder()
+                    .type(ChatMessageSaveDto.MessageType.QUIT)
+                    .roomId(roomId)
+                    .userList(chatRoomService.findUser(roomId, sessionId))
+                    .build();
 
             //list 주기
-            redisPublisher.publish(topic,
-                    ChatMessageSaveDto.builder()
-                            .type(ChatMessageSaveDto.MessageType.QUIT)
-                            .roomId(roomId)
-                            .userList(chatRoomService.findUser(roomId, sessionId))
-                            .build()
+
+            redisPublisher.publishChatMessage(topic,
+                    MessageDto.<ChatMessageSaveDto>builder()
+                            .data(chatMessageSaveDto)
+                            .type(MessageDto.MessageType.CHAT).build()
+
             );
 
         }

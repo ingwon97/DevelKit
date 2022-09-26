@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @Setter
 @AllArgsConstructor
-public class ResChatPagingDto {
+public class ChatPagingResponseDto {
 
     private Long workSpaceId;
     private String writer;
@@ -17,8 +17,8 @@ public class ResChatPagingDto {
     private String createdAt;
     private String nickname;
 
-    public static ResChatPagingDto of(Chat chat){
-        return ResChatPagingDto.builder()
+    public static ChatPagingResponseDto of(Chat chat){
+        return ChatPagingResponseDto.builder()
                 .writer(chat.getUsers())
                 .workSpaceId(chat.getWorkSpace().getId())
                 .createdAt(chat.getCreatedAt())
@@ -26,8 +26,8 @@ public class ResChatPagingDto {
                 .build();
     }
 
-    public static ResChatPagingDto byChatMessageDto(ChatMessageSaveDto chatMessageSaveDto){
-        return ResChatPagingDto.builder()
+    public static ChatPagingResponseDto byChatMessageDto(ChatMessageSaveDto chatMessageSaveDto){
+        return ChatPagingResponseDto.builder()
                 .writer(chatMessageSaveDto.getWriter())
                 .createdAt(chatMessageSaveDto.getCreatedAt())
                 .workSpaceId(Long.parseLong(chatMessageSaveDto.getRoomId()))

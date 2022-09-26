@@ -3,7 +3,7 @@ package com.hanghae.final_project.domain.chatting.service;
 import com.hanghae.final_project.domain.chatting.dto.ChatRoomDto;
 import com.hanghae.final_project.domain.chatting.dto.request.ChatMessageSaveDto;
 import com.hanghae.final_project.domain.chatting.dto.request.ChatPagingDto;
-import com.hanghae.final_project.domain.chatting.dto.response.ResChatPagingDto;
+import com.hanghae.final_project.domain.chatting.dto.response.ChatPagingResponseDto;
 import com.hanghae.final_project.domain.chatting.model.Chat;
 import com.hanghae.final_project.domain.chatting.repository.ChatRepository;
 import com.hanghae.final_project.domain.chatting.utils.ChatUtils;
@@ -93,7 +93,7 @@ public class ChatRedisCacheService {
     //WorkspaceId 를 통해서 채팅 내용 조회 Paging 처리
     @Transactional(readOnly = true)
     //@Cacheable(key = "#workSpaceId + #cursor",value = "chatData",cacheManager = "redisCacheManager")
-    public ResponseDto<List<ResChatPagingDto>> getChats(Long workSpaceId, String cursor) {
+    public ResponseDto<List<ChatPagingResponseDto>> getChats(Long workSpaceId, String cursor) {
 
 
         Slice<Chat> chatSlice =
@@ -104,8 +104,8 @@ public class ChatRedisCacheService {
                                 PageRequest.of(0, 10)
                         );
 
-        List<ResChatPagingDto> chats = chatSlice.stream()
-                .map(ResChatPagingDto::of)
+        List<ChatPagingResponseDto> chats = chatSlice.stream()
+                .map(ChatPagingResponseDto::of)
                 .collect(Collectors.toList());
 
         return ResponseDto.success(chats);
@@ -113,7 +113,7 @@ public class ChatRedisCacheService {
     }
 
     //우선 기본적으로 redis로 부터 데이터가 있는지 확인하자.
-    public ResponseDto<List<ResChatPagingDto> > getChatsFromRedis(Long workSpaceId, ChatPagingDto chatPagingDto) {
+    public ResponseDto<List<ChatPagingResponseDto> > getChatsFromRedis(Long workSpaceId, ChatPagingDto chatPagingDto) {
 
         //마지막 채팅을 기준으로 redis의 Sorted set에 몇번째 항목인지 파악
         ChatMessageSaveDto cursorDto = ChatMessageSaveDto.builder()
@@ -139,10 +139,10 @@ public class ChatRedisCacheService {
 
         //Stream을 사용해서 List로 변환 후 ,
         //이 변환이 필요할까에 대해서는 나중에 좀 더 생각해보자.
-        List<ResChatPagingDto> chatMessageDtoList =
+        List<ChatPagingResponseDto> chatMessageDtoList =
                 chatMessageSaveDtoSet
                         .stream()
-                        .map(ResChatPagingDto::byChatMessageDto)
+                        .map(ChatPagingResponseDto::byChatMessageDto)
                         .collect(Collectors.toList());
 
         //만약 채팅 데이터가 10개가 아니라면, DB에 데이터가 더 있는지 확인해야함
@@ -151,14 +151,14 @@ public class ChatRedisCacheService {
             findOtherChatDataInMysql(chatMessageDtoList,workSpaceId ,chatPagingDto.getCursor());
         }
 
-        for(ResChatPagingDto resChatPagingDto : chatMessageDtoList){
-            resChatPagingDto.setNickname( findUserNicknameByUsername(resChatPagingDto.getWriter()) );
+        for(ChatPagingResponseDto chatPagingResponseDto : chatMessageDtoList){
+            chatPagingResponseDto.setNickname( findUserNicknameByUsername(chatPagingResponseDto.getWriter()) );
 
         }
 
         return ResponseDto.success(chatMessageDtoList);
     }
-    private void findOtherChatDataInMysql(List<ResChatPagingDto> chatMessageDtoList, Long workSpaceId, String cursor ){
+    private void findOtherChatDataInMysql(List<ChatPagingResponseDto> chatMessageDtoList, Long workSpaceId, String cursor ){
 
         String lastCursor;
         // 데이터가 하나도 없을 경우 현재시간을 Cursor로 활용
@@ -199,7 +199,7 @@ public class ChatRedisCacheService {
         for(int i = dtoListSize ; i <=10;i++){
             try{
                 Chat chat = chatSlice.getContent().get( i - dtoListSize );
-                chatMessageDtoList.add(ResChatPagingDto.of(chat));
+                chatMessageDtoList.add(ChatPagingResponseDto.of(chat));
             }catch (IndexOutOfBoundsException e){
                 return;
             }

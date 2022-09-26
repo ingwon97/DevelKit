@@ -2,6 +2,7 @@ package com.hanghae.final_project.domain.chatting.controller;
 
 
 import com.hanghae.final_project.domain.chatting.dto.request.ChatMessageSaveDto;
+import com.hanghae.final_project.domain.chatting.dto.request.MessageDto;
 import com.hanghae.final_project.domain.chatting.redis.RedisPublisher;
 
 import com.hanghae.final_project.domain.chatting.service.ChatRedisCacheService;
@@ -29,7 +30,7 @@ public class StompChatController {
 
     private final ChatRedisCacheService chatRedisCacheService;
 
-    private final RedisTemplate<String,String> roomRedisTemplate;
+    private final RedisTemplate<String, String> roomRedisTemplate;
     private final ChannelTopic channelTopic;
     private final HeaderTokenExtractor headerTokenExtractor;
     private final JwtDecoder jwtDecoder;
@@ -38,7 +39,7 @@ public class StompChatController {
      * */
 
     @MessageMapping("/chat/message")
-    public void message(ChatMessageSaveDto message, @Header("token") String token){
+    public void message(ChatMessageSaveDto message, @Header("token") String token) {
         UserInfo userInfo = jwtDecoder.decodeUsername(headerTokenExtractor.extract(token));
 
         message.setNickname(userInfo.getNickname());
@@ -46,7 +47,12 @@ public class StompChatController {
         message.setType(ChatMessageSaveDto.MessageType.TALK);
         message.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS")));
 
-        redisPublisher.publish(channelTopic,message);
+        redisPublisher.publishChatMessage(channelTopic,
+                MessageDto.<ChatMessageSaveDto>builder()
+                        .data(message)
+                        .type(MessageDto.MessageType.CHAT)
+                        .build()
+        );
         chatRedisCacheService.addChat(message);
     }
 

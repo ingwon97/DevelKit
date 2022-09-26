@@ -1,5 +1,8 @@
 package com.hanghae.final_project.domain.workspace.service;
 
+import com.hanghae.final_project.domain.chatting.dto.request.AlarmMessageDto;
+import com.hanghae.final_project.domain.chatting.dto.request.MessageDto;
+import com.hanghae.final_project.domain.chatting.redis.RedisPublisher;
 import com.hanghae.final_project.domain.workspace.dto.response.NoticeResponseDto;
 import com.hanghae.final_project.domain.workspace.dto.request.NoticeRequestDto;
 import com.hanghae.final_project.domain.workspace.model.Notice;
@@ -11,6 +14,7 @@ import com.hanghae.final_project.global.exception.ErrorCode;
 import com.hanghae.final_project.global.exception.RequestException;
 import com.hanghae.final_project.global.config.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,12 +27,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class NoticeService {
-    //db에 연결했으면 직접 갚넣고
+
     private final NoticeRepository noticeRepository;
     private final WorkSpaceRepository workSpaceRepository;
 
-    //공지사항 생성
+    private final RedisPublisher redisPublisher;
 
+    private final ChannelTopic channelTopic;
+    //공지사항 생성
     @Transactional
     public ResponseEntity<ResponseDto<NoticeResponseDto>> createNotice(NoticeRequestDto noticeRequestDto,
                                           Long workSpaceId,
@@ -43,6 +49,16 @@ public class NoticeService {
 
         noticeRepository.save(notice);
         NoticeResponseDto noticeResponseDto = NoticeResponseDto.of(notice);
+
+        //알림 event 발생
+        AlarmMessageDto alarmMessageDto= AlarmMessageDto.makeNoticeAlarmMessageDto(notice);
+
+        //알림발송
+        redisPublisher.pulishAlarmMessage(channelTopic,
+                MessageDto.<AlarmMessageDto>builder()
+                        .data(alarmMessageDto)
+                        .type(MessageDto.MessageType.ALARM)
+                        .build());
 
         return new ResponseEntity<>(ResponseDto.success(noticeResponseDto), HttpStatus.OK);
     }
