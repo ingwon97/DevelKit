@@ -1,12 +1,18 @@
 # D-velkit
+웹 소켓을 이용한 채팅과 협력 툴
 ![Github_리드미_백엔드](https://user-images.githubusercontent.com/70882917/193630557-54c72f8c-c22c-4518-878a-aa29a25949a0.png)
-<p align="center"><img src="https://user-images.githubusercontent.com/70882917/202708426-4ecdcf79-7238-498f-919f-919da03af1d8.jpeg"></p>
+
 
 ## 소개프로젝트 소개
 파일공유, 일정관리, 채팅 등 다양한 기능을 한번에 사용할 수 있는 협업툴
 프로젝트 생성 후 초대코드를 팀원들에게 전달하면 팀공간 WorkSpace에 참여가능
 
-[체험해보기!!](https://d-velkit.com/)
+https://d-velkit.com/
+
+## 🎬 시연 영상
+<!-- [시연 및 소개영상](https://www.youtube.com/watch?v=KBnkppEY78I) -->
+[시연 영상](https://youtu.be/p4rir1fJU3M)
+
 
 ## 📅 프로젝트 기간
 2022/08/26 ~ 2022/10/07
@@ -16,46 +22,28 @@
 ## 🚀👩‍🚀👨‍🚀 팀원
 |이름|깃헙주소|담당|
 |:---:|:---:|:---:|
-|FE|[https://github.com/develkitProject/frontend](https://github.com/develkitProject/frontend)|FE/React|
-|한호성L|[https://github.com/hosunghan-0821](https://github.com/hosunghan-0821)|BE/Spring|
+|FE|[https://github.com/LuisKlopp](https://github.com/develkitProject/frontend)|FE/React|
+|한호성|[https://github.com/hosunghan-0821](https://github.com/hosunghan-0821)|BE/Spring|
 |황인권|[https://github.com/ingwon97](https://github.com/ingwon97)|BE/Spring|
 |이재헌|[https://github.com/romeo92s](https://github.com/romeo92s)|BE/Spring|
 |임준철|[https://github.com/cheoljun0422](https://github.com/cheoljun0422)|BE/Spring|
-|류현VL|[https://github.com/LuisKlopp](https://github.com/LuisKlopp)|FE/React|
+|류현|[https://github.com/LuisKlopp](https://github.com/LuisKlopp)|FE/React|
 |이지혜|[https://github.com/G-Hae](https://github.com/G-Hae)|FE/React|
 |김소정|[https://github.com/kimsojeong01](https://github.com/kimsojeong01)|Designer|
 
 
-## 🎬 시연 및 소개영상
-[시연 및 소개영상](https://www.youtube.com/watch?v=KBnkppEY78I)
-
 
 ## 📚 기술스택
-Language&build tool
-<br>
 <img src="https://img.shields.io/badge/Java-536DFE?style=flat-square&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=Gradle&logoColor=white"/>
-<br>
-Framework
-<br>
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=Spring Boot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat-square&logo=Spring Security&logoColor=white"/>
-<br>
-Library
-<br>
-<img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=Swagger&logoColor=white"/>
-<img src="https://img.shields.io/badge/Sock.js-000000?style=flat-square&logo=Sock.js&logoColor=white"/>
-<img src="https://img.shields.io/badge/Stomp-000000?style=flat-square&logo=Stomp&logoColor=white"/>
-<br>
-Database
-<br>
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=Spring Boot&logoColor=white"/>
 <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white"/>
+<img src="https://img.shields.io/badge/NGINX-009639?style=flat-square&logo=NGINX&logoColor=white"/>
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=Swagger&logoColor=white"/>
 <br>
-Deploy
-<br>
-<img src="https://img.shields.io/badge/NGINX-009639?style=flat-square&logo=NGINX&logoColor=white"/> <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat-square&logo=AmazonEC2&logoColor=white"/>
+<img src="https://img.shields.io/badge/Amazon EC2-FF9900?style=flat-square&logo=Amazon EC2&logoColor=white"/> <img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat-square&logo=Amazon S3&logoColor=white"/>
+<img src="https://img.shields.io/badge/Stomp-000000?style=flat-square&logo=Stomp&logoColor=white"/>
+<img src="https://img.shields.io/badge/Sock.JS-000000?style=flat-square&logo=Sock.JS&logoColor=white"/>
 <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=flat-square&logo=GitHub Actions&logoColor=white"/>
-<img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat-square&logo=Amazon S3&logoColor=white"/>
-
 
 
 ## 🔧 사용 툴
@@ -65,21 +53,27 @@ Deploy
 <img src="https://img.shields.io/badge/Notion-000000?style=flat-square&logo=Notion&logoColor=white"/>
 <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=Postman&logoColor=white"/>
 <img src="https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=Slack&logoColor=white"/>
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/>
 <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=Figma&logoColor=white"/>
+
+
+## 🖥 서버
+<img src="https://img.shields.io/badge/NGINX-009639?style=flat-square&logo=NGINX&logoColor=white"/> <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat-square&logo=AmazonEC2&logoColor=white"/>
 
 
 ## 🧱 ERD
 <img width="960" alt="erd 최종" src="https://user-images.githubusercontent.com/70882917/193749206-4beff896-43a8-40ff-b38a-b7bea6b0713d.png">
 
 
+
 ## ⇆ 서비스 아키텍쳐
 <img width="895" alt="디벨킷아키텍처" src="https://user-images.githubusercontent.com/70882917/193648270-6f9f85d4-dc2c-41be-ad19-386deafd5012.png">
 
 
-## 📜 API
-[🗒 명세서 ](https://www.notion.so/379722be5a5f4ff4a4a61a0b5e72d244?v=7ebf5e46885447629e6cd31fab990a9d)
+<!-- ## 📜 API
+[🗒 명세서 ](https://www.notion.so/379722be5a5f4ff4a4a61a0b5e72d244?v=7ebf5e46885447629e6cd31fab990a9d) -->
 
-
+<!--
 ## ⚙ 주요기능
 <details>
 <summary>게스트 로그인</summary>
@@ -128,7 +122,7 @@ Deploy
 
 </div>
 </details>
-
+-->
 
 
 ## 🧑‍💻 기술적 의사 결정
@@ -139,6 +133,7 @@ Deploy
 |Stomp,Sock.Js|기존의 Websocket위에서 작동하는 프로토콜로, 클라이언트와 서버의 통신에 사용할 메시징 형식이 정의되어 있고, 그에 맞춰서 데이터 송수신에 편리함이 있어 선택 <br> Spring STOMP의 내장된 Message Broker와 Publish/Subscribe 기능을 통해, 데이터를 원하는 클라이언트로 전달하는데 편리함이 있어 선택 <br> 유저의 브라우저가 Websocket 지원하지 않을 경우를 대비하여 Sock.js 선택|
 |Redis|채팅 데이터를 빠르게 읽고 쓰기 위한 caching용 DB로 선택|
 
+<!--
 
 ## ⚡ 트러블슈팅
 
@@ -262,3 +257,4 @@ Off-Set paging 의 경우, 새로운 데이터가 삽입될 시, 데이터 중�
 </div>
 </details>
 
+-->
